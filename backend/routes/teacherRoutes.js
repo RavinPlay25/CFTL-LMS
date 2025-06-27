@@ -1,4 +1,6 @@
 const express = require('express');
+const { verifyFirebaseToken } = require('../middleware/firebaseAuth');
+const { createOrUpdateTeacherProfile } = require('../controllers/teacherController');
 const {
   createTeacher,
   getAllTeachers,
@@ -9,6 +11,7 @@ const {
 
 const router = express.Router();
 
+router.post('/profile', verifyFirebaseToken, createOrUpdateTeacherProfile);
 router.post('/', createTeacher);
 router.get('/', getAllTeachers);
 router.get('/:id', getTeacherById);
