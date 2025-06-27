@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const syllabusRoutes = require("./routes/syllabusRoutes");
+const teacherRoutes = require("./routes/teacherRoutes");
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/syllabus", syllabusRoutes);
+app.use('/api/teachers', teacherRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
