@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 
 const syllabusRoutes = require("./routes/syllabusRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
+const parentRoutes = require('./routes/parentRoutes');
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use("/api/syllabus", syllabusRoutes);
 app.use('/api/teachers', teacherRoutes);
+app.use('/api/parents', parentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
