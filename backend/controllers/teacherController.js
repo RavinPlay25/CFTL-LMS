@@ -24,6 +24,24 @@ exports.createTeacher = async (req, res) => {
   }
 };
 
+// Call this after verifying Firebase token
+exports.createOrUpdateTeacherProfile = async (req, res) => {
+  try {
+    const { uid, email } = req.user;
+    const data = req.body; // includes name, type, salary, etc.
+
+    await db.collection('teachers').doc(uid).set({
+      email,
+      ...data,
+    }, { merge: true });
+
+    res.status(200).send({ message: 'Profile saved', uid });
+
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 
 exports.getAllTeachers = async (req, res) => {
   try {
