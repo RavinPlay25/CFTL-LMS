@@ -5,7 +5,8 @@ const dotenv = require("dotenv");
 const syllabusRoutes = require("./routes/syllabusRoutes");
 const teacherRoutes = require("./routes/teacherRoutes");
 const parentRoutes = require("./routes/parentRoutes");
-const authRoutes = require("./routes/authRoutes"); // ✅ NEW
+const authRoutes = require("./routes/authRoutes"); 
+const studentRoutes = require('./routes/studentRoutes');
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.use(express.json());
 app.use("/api/syllabus", syllabusRoutes);
 app.use("/api/teachers", teacherRoutes);
 app.use("/api/parents", parentRoutes);
-app.use("/api/auth", authRoutes); // ✅ NEW
+app.use("/api/auth", authRoutes); 
+app.use('/api/students', studentRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
