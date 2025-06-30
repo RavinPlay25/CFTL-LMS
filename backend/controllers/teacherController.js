@@ -23,6 +23,20 @@ exports.createTeacher = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
+exports.getTeacherProfile = async (req, res) => {
+  try {
+    const { uid, email } = req.user;
+
+    const doc = await db.collection('teachers').doc(uid).get();
+    if (!doc.exists) {
+      return res.status(404).send({ error: 'Profile not found' });
+    }
+
+    return res.status(200).send(doc.data());
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
 
 // Call this after verifying Firebase token
 exports.createOrUpdateTeacherProfile = async (req, res) => {
