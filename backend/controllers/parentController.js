@@ -40,6 +40,31 @@ exports.getAllParents = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
+exports.getChildrenByParentNic = async (req, res) => {
+  try {
+    const nic = req.user.nic; // from JWT
+
+    const studentsRef = db.collection('students');
+    const matching = [];
+
+    const snapshot = await studentsRef.get();
+    snapshot.forEach(doc => {
+      const s = doc.data();
+      if (
+        s.parents?.mother?.nic === nic ||
+        s.parents?.father?.nic === nic ||
+        s.nominee?.nic === nic
+      ) {
+        matching.push({ id: doc.id, ...s });
+      }
+    });
+
+    res.status(200).send(matching);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
 
 exports.getParentById = async (req, res) => {
   try {
