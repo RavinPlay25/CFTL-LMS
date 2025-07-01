@@ -9,7 +9,6 @@ export default function StudentRegister() {
     monthlyFee: '',
     preBudget: '',
     totalAmount: '',
-    nameFull: '',
     nameInitials: '',
     dob: '',
     religion: 'Buddhism',
