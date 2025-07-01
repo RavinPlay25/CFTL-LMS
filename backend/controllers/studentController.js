@@ -1,11 +1,28 @@
 const { db } = require('../config/firebase');
-// const { uploadCompressedImage } = require('../utils/uploadToGCS');
 
 const isValidNIC = (nic) => {
   const nic12 = /^\d{12}$/;
   const nicOld = /^\d{9}[vV]$/;
   return nic12.test(nic) || nicOld.test(nic);
 };
+
+// Helper to auto-create parent if not exists
+const tryCreateParent = async (nic, email, name) => {
+  if (!nic || !isValidNIC(nic)) return;
+
+  const parentRef = db.collection('parents');
+  const existing = await parentRef.where('nic', '==', nic).limit(1).get();
+
+  if (existing.empty) {
+    await parentRef.add({
+      nic,
+      password: nic, // default password
+      email: email || null,
+      name: name || 'Unknown', // fallback in case name is missing
+    });
+  }
+};
+
 
 exports.createStudent = async (req, res) => {
   try {
@@ -28,9 +45,10 @@ exports.createStudent = async (req, res) => {
       previousSchool,
       subjects,
       nominee,
-      medical
+      medical,
     } = req.body;
 
+    // NIC format validations
     if (nic && !isValidNIC(nic)) {
       return res.status(400).send({ error: 'Invalid student NIC format' });
     }
@@ -44,7 +62,12 @@ exports.createStudent = async (req, res) => {
       return res.status(400).send({ error: 'Invalid nominee NIC format' });
     }
 
- const profilePictureUrl = null; // placeholder for now
+    const profilePictureUrl = null; // placeholder for now
+
+    // Auto-create parent accounts
+await tryCreateParent(mother?.nic, mother?.email, mother?.name);
+await tryCreateParent(father?.nic, father?.email, father?.name);
+await tryCreateParent(nominee?.nic, null, nominee?.name);
 
 
     const studentData = {
@@ -66,7 +89,7 @@ exports.createStudent = async (req, res) => {
       previousSchool,
       subjects,
       nominee,
-      medical
+      medical,
     };
 
     const docRef = await db.collection('students').add(studentData);

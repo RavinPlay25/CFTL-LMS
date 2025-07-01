@@ -7,6 +7,7 @@ import TeacherRegister from './pages/TeacherRegister';
 import TeacherCompleteProfile from './pages/TeacherCompleteProfile';
 import ParentRegister from './pages/ParentRegistration';
 import ParentDashboard from './pages/ParentDashboard';
+import StudentRegister from './pages/StudentRegister';
 
 
 export default function App() {
@@ -21,6 +22,8 @@ export default function App() {
       <Route path="/parent-login" element={<ParentLogin />} />
       <Route path="/parent-register" element={<ParentRegister />} />
       <Route path="/parent-dashboard" element={<ParentDashboard />} />
+      <Route path="/student-register" element={<StudentRegister />} />
+      {/* Add more routes as needed */}
     </Routes>
   );
 }
