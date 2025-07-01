@@ -81,74 +81,458 @@ export default function StudentRegister() {
     try {
       await axios.post('http://localhost:5000/api/students', dataToSend);
       setSuccess('Student registered successfully!');
+      // Reset form after successful submission
+      setForm({
+        registrationNo: '',
+        registrationDate: '',
+        registrationFee: '',
+        monthlyFee: '',
+        preBudget: '',
+        totalAmount: '',
+        nameInitials: '',
+        dob: '',
+        religion: 'Buddhism',
+        nic: '',
+        address: '',
+        telephone: '',
+        mother: {
+          name: '',
+          occupation: '',
+          workplaceAddress: '',
+          mobile: '',
+          nic: '',
+          email: '',
+        },
+        father: {
+          name: '',
+          occupation: '',
+          workplaceAddress: '',
+          mobile: '',
+          nic: '',
+          email: '',
+        },
+        previousSchool: '',
+        subjects: '',
+        nominee: {
+          name: '',
+          address: '',
+          mobile: '',
+          nic: '',
+        },
+        medical: '',
+      });
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong.');
     }
   };
 
   return (
-    <div>
-      <h2>Student Registration</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+        <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">Student Registration</h2>
+        
+        {error && <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded">{error}</div>}
+        {success && <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded">{success}</div>}
 
-        {/* Basic Info */}
-        <input type="text" name="registrationNo" placeholder="Registration No" value={form.registrationNo} onChange={handleChange} /><br />
-        <input type="date" name="registrationDate" placeholder="Date" value={form.registrationDate} onChange={handleChange} /><br />
-        <input type="number" name="registrationFee" placeholder="Registration Fee" value={form.registrationFee} onChange={handleChange} /><br />
-        <input type="number" name="monthlyFee" placeholder="Monthly Fee" value={form.monthlyFee} onChange={handleChange} /><br />
-        <input type="number" name="preBudget" placeholder="Pre Budget" value={form.preBudget} onChange={handleChange} /><br />
-        <input type="number" name="totalAmount" placeholder="Total Amount" value={form.totalAmount} onChange={handleChange} /><br />
-        <input type="text" name="nameFull" placeholder="Name in FULL (BLOCK LETTERS)" value={form.nameFull} onChange={handleChange} /><br />
-        <input type="text" name="nameInitials" placeholder="Name with Initials" value={form.nameInitials} onChange={handleChange} /><br />
-        <input type="date" name="dob" placeholder="Date of Birth" value={form.dob} onChange={handleChange} /><br />
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Info Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Basic Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Registration No</label>
+                <input 
+                  type="text" 
+                  name="registrationNo" 
+                  value={form.registrationNo} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Registration Date</label>
+                <input 
+                  type="date" 
+                  name="registrationDate" 
+                  value={form.registrationDate} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Registration Fee (LKR)</label>
+                <input 
+                  type="number" 
+                  name="registrationFee" 
+                  value={form.registrationFee} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Monthly Fee (LKR)</label>
+                <input 
+                  type="number" 
+                  name="monthlyFee" 
+                  value={form.monthlyFee} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Pre Budget (LKR)</label>
+                <input 
+                  type="number" 
+                  name="preBudget" 
+                  value={form.preBudget} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Total Amount (LKR)</label>
+                <input 
+                  type="number" 
+                  name="totalAmount" 
+                  value={form.totalAmount} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name in FULL (BLOCK LETTERS)</label>
+                <input 
+                  type="text" 
+                  name="nameFull" 
+                  value={form.nameFull} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name with Initials</label>
+                <input 
+                  type="text" 
+                  name="nameInitials" 
+                  value={form.nameInitials} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                <input 
+                  type="date" 
+                  name="dob" 
+                  value={form.dob} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Religion</label>
+                <select 
+                  name="religion" 
+                  value={form.religion} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="Buddhism">Buddhism</option>
+                  <option value="Catholicism">Catholicism</option>
+                  <option value="Islam">Islam</option>
+                  <option value="Hindu">Hindu</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">NIC (optional)</label>
+                <input 
+                  type="text" 
+                  name="nic" 
+                  value={form.nic} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Permanent Address</label>
+                <input 
+                  type="text" 
+                  name="address" 
+                  value={form.address} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Telephone</label>
+                <input 
+                  type="text" 
+                  name="telephone" 
+                  value={form.telephone} 
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+            </div>
+          </div>
 
-        <select name="religion" value={form.religion} onChange={handleChange}>
-          <option value="Buddhism">Buddhism</option>
-          <option value="Catholicism">Catholicism</option>
-          <option value="Islam">Islam</option>
-          <option value="Hindu">Hindu</option>
-        </select><br />
+          {/* Mother's Details Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Mother's Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={form.mother.name} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                <input 
+                  type="text" 
+                  name="occupation" 
+                  value={form.mother.occupation} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Work Address</label>
+                <input 
+                  type="text" 
+                  name="workplaceAddress" 
+                  value={form.mother.workplaceAddress} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                <input 
+                  type="text" 
+                  name="mobile" 
+                  value={form.mother.mobile} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">NIC</label>
+                <input 
+                  type="text" 
+                  name="nic" 
+                  value={form.mother.nic} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={form.mother.email} 
+                  onChange={(e) => handleChange(e, 'mother')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
 
-        <input type="text" name="nic" placeholder="NIC (optional)" value={form.nic} onChange={handleChange} /><br />
-        <input type="text" name="address" placeholder="Permanent Address" value={form.address} onChange={handleChange} /><br />
-        <input type="text" name="telephone" placeholder="Telephone" value={form.telephone} onChange={handleChange} /><br />
+          {/* Father's Details Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Father's Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={form.father.name} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
+                <input 
+                  type="text" 
+                  name="occupation" 
+                  value={form.father.occupation} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Work Address</label>
+                <input 
+                  type="text" 
+                  name="workplaceAddress" 
+                  value={form.father.workplaceAddress} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                <input 
+                  type="text" 
+                  name="mobile" 
+                  value={form.father.mobile} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">NIC</label>
+                <input 
+                  type="text" 
+                  name="nic" 
+                  value={form.father.nic} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email (optional)</label>
+                <input 
+                  type="email" 
+                  name="email" 
+                  value={form.father.email} 
+                  onChange={(e) => handleChange(e, 'father')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
 
-        <h3>Mother's Details</h3>
-        <input type="text" name="name" placeholder="Name" value={form.mother.name} onChange={(e) => handleChange(e, 'mother')} /><br />
-        <input type="text" name="occupation" placeholder="Occupation" value={form.mother.occupation} onChange={(e) => handleChange(e, 'mother')} /><br />
-        <input type="text" name="workplaceAddress" placeholder="Work Address" value={form.mother.workplaceAddress} onChange={(e) => handleChange(e, 'mother')} /><br />
-        <input type="text" name="mobile" placeholder="Mobile Number" value={form.mother.mobile} onChange={(e) => handleChange(e, 'mother')} /><br />
-        <input type="text" name="nic" placeholder="NIC" value={form.mother.nic} onChange={(e) => handleChange(e, 'mother')} /><br />
-        <input type="email" name="email" placeholder="Email (optional)" value={form.mother.email} onChange={(e) => handleChange(e, 'mother')} /><br />
+          {/* Previous School Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Previous School</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">School Name</label>
+              <input 
+                type="text" 
+                name="previousSchool" 
+                value={form.previousSchool} 
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
 
-        <h3>Father's Details</h3>
-        <input type="text" name="name" placeholder="Name" value={form.father.name} onChange={(e) => handleChange(e, 'father')} /><br />
-        <input type="text" name="occupation" placeholder="Occupation" value={form.father.occupation} onChange={(e) => handleChange(e, 'father')} /><br />
-        <input type="text" name="workplaceAddress" placeholder="Work Address" value={form.father.workplaceAddress} onChange={(e) => handleChange(e, 'father')} /><br />
-        <input type="text" name="mobile" placeholder="Mobile Number" value={form.father.mobile} onChange={(e) => handleChange(e, 'father')} /><br />
-        <input type="text" name="nic" placeholder="NIC" value={form.father.nic} onChange={(e) => handleChange(e, 'father')} /><br />
-        <input type="email" name="email" placeholder="Email (optional)" value={form.father.email} onChange={(e) => handleChange(e, 'father')} /><br />
+          {/* Subjects Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Subjects</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Subjects (comma separated)</label>
+              <input 
+                type="text" 
+                name="subjects" 
+                value={form.subjects} 
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="e.g., Mathematics, Science, English"
+              />
+            </div>
+          </div>
 
-        <h3>Previous School</h3>
-        <input type="text" name="previousSchool" placeholder="Previous School" value={form.previousSchool} onChange={handleChange} /><br />
+          {/* Nominee Details Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Nominee Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  name="name" 
+                  value={form.nominee.name} 
+                  onChange={(e) => handleChange(e, 'nominee')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input 
+                  type="text" 
+                  name="address" 
+                  value={form.nominee.address} 
+                  onChange={(e) => handleChange(e, 'nominee')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                <input 
+                  type="text" 
+                  name="mobile" 
+                  value={form.nominee.mobile} 
+                  onChange={(e) => handleChange(e, 'nominee')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">NIC</label>
+                <input 
+                  type="text" 
+                  name="nic" 
+                  value={form.nominee.nic} 
+                  onChange={(e) => handleChange(e, 'nominee')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            </div>
+          </div>
 
-        <h3>Subjects</h3>
-        <input type="text" name="subjects" placeholder="Subjects (comma separated)" value={form.subjects} onChange={handleChange} /><br />
+          {/* Medical Info Section */}
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h3 className="text-xl font-semibold text-blue-800 mb-4">Medical Information</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Medications / Illness</label>
+              <textarea 
+                name="medical" 
+                value={form.medical} 
+                onChange={handleChange}
+                rows="3"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
 
-        <h3>Nominee Details</h3>
-        <input type="text" name="name" placeholder="Name" value={form.nominee.name} onChange={(e) => handleChange(e, 'nominee')} /><br />
-        <input type="text" name="address" placeholder="Address" value={form.nominee.address} onChange={(e) => handleChange(e, 'nominee')} /><br />
-        <input type="text" name="mobile" placeholder="Mobile Number" value={form.nominee.mobile} onChange={(e) => handleChange(e, 'nominee')} /><br />
-        <input type="text" name="nic" placeholder="NIC" value={form.nominee.nic} onChange={(e) => handleChange(e, 'nominee')} /><br />
-
-        <h3>Medical Info</h3>
-        <textarea name="medical" placeholder="Medications / Illness" value={form.medical} onChange={handleChange} /><br />
-
-        <button type="submit">Register Student</button>
-      </form>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+          {/* Submit Button */}
+          <div className="flex justify-center">
+            <button 
+              type="submit" 
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Register Student
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
