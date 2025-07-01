@@ -3,6 +3,7 @@ export default function Home() {
     <div>
       <h1>Welcome to CFTL School System</h1>
       <a href="/parent-login">Parent Login</a> | <a href="/teacher-login">Teacher Login</a> | <a href="/teacher-register">Teacher Register</a>
+      <a href="/student-register">Student Register</a>
     </div>
   );
 }
