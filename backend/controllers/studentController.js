@@ -1,7 +1,7 @@
 const { db } = require('../config/firebase');
 const { uploadCompressedImage } = require('../utils/uploadToGCS');
 const collection = db.collection('students');
-
+const admin = require('firebase-admin');
 
 const isValidNIC = (nic) => {
   const nic12 = /^\d{12}$/;
@@ -28,46 +28,23 @@ const tryCreateParent = async (nic, email, name) => {
 
 exports.createStudent = async (req, res) => {
   try {
-    // Parse data: if multipart/form-data, JSON is inside req.body.data
     const body = req.body.data ? JSON.parse(req.body.data) : req.body;
 
     const {
-      registrationNo,
-      registrationDate,
-      registrationFee,
-      monthlyFee,
-      preBudget,
-      totalAmount,
-      nameFull,
-      nameInitials,
-      dob,
-      religion,
       nic,
-      address,
-      telephone,
+      dob,
       mother,
       father,
-      previousSchool,
-      subjects,
       nominee,
-      medical,
     } = body;
 
-    // NIC format validations
-    if (nic && !isValidNIC(nic)) {
-      return res.status(400).send({ error: 'Invalid student NIC format' });
-    }
-    if (mother?.nic && !isValidNIC(mother.nic)) {
-      return res.status(400).send({ error: 'Invalid mother NIC format' });
-    }
-    if (father?.nic && !isValidNIC(father.nic)) {
-      return res.status(400).send({ error: 'Invalid father NIC format' });
-    }
-    if (nominee?.nic && !isValidNIC(nominee.nic)) {
-      return res.status(400).send({ error: 'Invalid nominee NIC format' });
-    }
+    // ✅ Validate NIC formats
+    if (nic && !isValidNIC(nic)) return res.status(400).send({ error: 'Invalid student NIC format' });
+    if (mother?.nic && !isValidNIC(mother.nic)) return res.status(400).send({ error: 'Invalid mother NIC format' });
+    if (father?.nic && !isValidNIC(father.nic)) return res.status(400).send({ error: 'Invalid father NIC format' });
+    if (nominee?.nic && !isValidNIC(nominee.nic)) return res.status(400).send({ error: 'Invalid nominee NIC format' });
 
-    // ✅ Handle profile picture upload if file is present
+    // ✅ Upload profile picture if present
     const profilePictureUrl = req.file
       ? await uploadCompressedImage(req.file.buffer, req.file.originalname)
       : null;
@@ -77,35 +54,51 @@ exports.createStudent = async (req, res) => {
     await tryCreateParent(father?.nic, father?.email, father?.name);
     await tryCreateParent(nominee?.nic, null, nominee?.name);
 
-    const studentData = {
-      profilePictureUrl,
-      registrationNo,
-      registrationDate: new Date(registrationDate),
-      registrationFee: Number(registrationFee),
-      monthlyFee: Number(monthlyFee),
-      preBudget: Number(preBudget),
-      totalAmount: Number(totalAmount),
-      nameFull,
-      nameInitials,
-      dob: new Date(dob),
-      religion,
-      nic,
-      address,
-      telephone,
-      parents: { mother, father },
-      previousSchool,
-      subjects,
-      nominee,
-      medical,
-    };
+    // ✅ Use a Firestore transaction to generate unique registrationNo
+    const result = await db.runTransaction(async (transaction) => {
+      const counterRef = db.collection('counters').doc('student');
+      const counterDoc = await transaction.get(counterRef);
 
-    const docRef = await db.collection('students').add(studentData);
-    res.status(201).send({ id: docRef.id });
+      if (!counterDoc.exists) {
+        throw new Error('Student counter not initialized.');
+      }
+
+      const lastReg = counterDoc.data().lastRegNumber || 0;
+      const nextReg = lastReg + 1;
+      const registrationNo = `STD${String(nextReg).padStart(4, '0')}`;
+
+      // ✅ Update counter
+      transaction.update(counterRef, { lastRegNumber: nextReg });
+
+      // ✅ Prepare student data
+      const studentData = {
+        ...body,
+        registrationNo,
+        registrationDate: admin.firestore.Timestamp.now(),
+        registrationFee: Number(body.registrationFee),
+        monthlyFee: Number(body.monthlyFee),
+        preBudget: Number(body.preBudget),
+        totalAmount: Number(body.totalAmount),
+        dob: new Date(dob),
+        profilePictureUrl,
+        parents: { mother, father },
+        subjects: body.subjects,
+        nominee,
+      };
+
+      const newDocRef = db.collection('students').doc();
+      transaction.set(newDocRef, studentData);
+
+      return { id: newDocRef.id, registrationNo, registrationDate: new Date() };
+    });
+
+    res.status(201).send(result);
   } catch (err) {
     console.error(err);
     res.status(500).send({ error: err.message });
   }
 };
+
 
 // ✅ GET all students
 exports.getAllStudents = async (req, res) => {
@@ -168,3 +161,26 @@ exports.deleteStudent = async (req, res) => {
     res.status(500).send({ error: err.message });
   }
 };
+
+exports.getLatestRegistrationNo = async (req, res) => {
+  try {
+    const counterDoc = await db.collection('counters').doc('student').get();
+
+    if (!counterDoc.exists) {
+      return res.status(200).send({ registrationNo: null });
+    }
+
+    const { lastRegNumber } = counterDoc.data();
+    const latestRegNo = lastRegNumber > 0
+      ? `STD${String(lastRegNumber).padStart(4, '0')}`
+      : null;
+
+    res.status(200).send({ registrationNo: latestRegNo });
+  } catch (err) {
+    console.error('Error fetching latest registration number:', err);
+    res.status(500).send({ error: err.message });
+  }
+};
+
+
+

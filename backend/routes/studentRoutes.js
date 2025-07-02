@@ -5,7 +5,8 @@ const {
   getAllStudents, 
   getStudentById, 
   updateStudent, 
-  deleteStudent 
+  deleteStudent,
+  getLatestRegistrationNo 
 } = require('../controllers/studentController'); // Import all required functions
 
 const router = express.Router();
@@ -14,9 +15,11 @@ const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.get('/', getAllStudents);
+router.get('/latest-regno', getLatestRegistrationNo);
 router.get('/:id', getStudentById);
 router.post('/', upload.single('profilePicture'), createStudent);
 router.put('/:id', upload.single('profilePicture'), updateStudent); // Add route for update
 router.delete('/:id', deleteStudent);
+
 
 module.exports = router;
