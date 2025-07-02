@@ -9,7 +9,7 @@ const fs = require('fs');
 const storage = new Storage({
   keyFilename: path.join(__dirname, '../serviceAccountKey.json'), // adjust if needed
 });
-const bucket = storage.bucket('cftl-student-profiles'); // replace with your bucket name
+const bucket = storage.bucket('cftl-student-profile-images'); // replace with your bucket name
 
 async function uploadCompressedImage(fileBuffer, originalName) {
   const compressedPath = path.join(os.tmpdir(), `${crypto.randomUUID()}.webp`);
