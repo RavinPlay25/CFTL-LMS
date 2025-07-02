@@ -1,4 +1,7 @@
 const { db } = require('../config/firebase');
+const { uploadCompressedImage } = require('../utils/uploadToGCS');
+const collection = db.collection('students');
+
 
 const isValidNIC = (nic) => {
   const nic12 = /^\d{12}$/;
@@ -18,14 +21,16 @@ const tryCreateParent = async (nic, email, name) => {
       nic,
       password: nic, // default password
       email: email || null,
-      name: name || 'Unknown', // fallback in case name is missing
+      name: name || 'Unknown',
     });
   }
 };
 
-
 exports.createStudent = async (req, res) => {
   try {
+    // Parse data: if multipart/form-data, JSON is inside req.body.data
+    const body = req.body.data ? JSON.parse(req.body.data) : req.body;
+
     const {
       registrationNo,
       registrationDate,
@@ -46,7 +51,7 @@ exports.createStudent = async (req, res) => {
       subjects,
       nominee,
       medical,
-    } = req.body;
+    } = body;
 
     // NIC format validations
     if (nic && !isValidNIC(nic)) {
@@ -62,13 +67,15 @@ exports.createStudent = async (req, res) => {
       return res.status(400).send({ error: 'Invalid nominee NIC format' });
     }
 
-    const profilePictureUrl = null; // placeholder for now
+    // ✅ Handle profile picture upload if file is present
+    const profilePictureUrl = req.file
+      ? await uploadCompressedImage(req.file.buffer, req.file.originalname)
+      : null;
 
-    // Auto-create parent accounts
-await tryCreateParent(mother?.nic, mother?.email, mother?.name);
-await tryCreateParent(father?.nic, father?.email, father?.name);
-await tryCreateParent(nominee?.nic, null, nominee?.name);
-
+    // ✅ Auto-create parent accounts
+    await tryCreateParent(mother?.nic, mother?.email, mother?.name);
+    await tryCreateParent(father?.nic, father?.email, father?.name);
+    await tryCreateParent(nominee?.nic, null, nominee?.name);
 
     const studentData = {
       profilePictureUrl,
@@ -94,9 +101,70 @@ await tryCreateParent(nominee?.nic, null, nominee?.name);
 
     const docRef = await db.collection('students').add(studentData);
     res.status(201).send({ id: docRef.id });
-
   } catch (err) {
     console.error(err);
+    res.status(500).send({ error: err.message });
+  }
+};
+
+// ✅ GET all students
+exports.getAllStudents = async (req, res) => {
+  try {
+    const snapshot = await collection.get();
+    const students = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    res.status(200).send(students);
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
+// ✅ GET student by ID
+exports.getStudentById = async (req, res) => {
+  try {
+    const doc = await collection.doc(req.params.id).get();
+    if (!doc.exists) return res.status(404).send({ error: 'Student not found' });
+
+    res.status(200).send({ id: doc.id, ...doc.data() });
+  } catch (err) {
+    res.status(500).send({ error: err.message });
+  }
+};
+
+// ✅ UPDATE student by ID
+exports.updateStudent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const body = req.body.data ? JSON.parse(req.body.data) : req.body;
+
+    // Optional: validate NIC fields if being updated
+    for (const field of ['nic', 'mother?.nic', 'father?.nic', 'nominee?.nic']) {
+      const val = eval(`body.${field}`);
+      if (val && !isValidNIC(val)) {
+        return res.status(400).send({ error: `Invalid NIC format in ${field}` });
+      }
+    }
+
+    // Optional: handle profile picture update
+    let profilePictureUrl = null;
+    if (req.file) {
+      profilePictureUrl = await uploadCompressedImage(req.file.buffer, req.file.originalname);
+      body.profilePictureUrl = profilePictureUrl;
+    }
+
+    await collection.doc(id).update(body);
+    res.status(200).send({ id, ...body });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send({ error: err.message });
+  }
+};
+
+// ✅ DELETE student by ID
+exports.deleteStudent = async (req, res) => {
+  try {
+    await collection.doc(req.params.id).delete();
+    res.status(204).send();
+  } catch (err) {
     res.status(500).send({ error: err.message });
   }
 };
